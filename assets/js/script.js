@@ -1,5 +1,16 @@
 var tasks = {};
 
+var auditTask = function(taskEl){
+  var date = $(taskEl).find("span").text().trim();
+  var time = moment(date, "L").set("hour",17);
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
+  if(moment().isAfter(time)){
+    $(taskEl).addClass("list-group-item-danger");
+  }else if (Math.abs(moment().diff(time,"days"))<=2){
+    $(taskEl).addClass("list-group-item-warning");
+  }
+};
+
 var createTask = function(taskText, taskDate, taskList) {
   // create elements that make up a task item
   var taskLi = $("<li>").addClass("list-group-item");
@@ -12,6 +23,8 @@ var createTask = function(taskText, taskDate, taskList) {
 
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
+
+  auditTask(taskLi);
 
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
@@ -52,16 +65,16 @@ $(".card .list-group").sortable({
   tolerance: "pointer",
   helper: "clone",
   activate: function(event, ui) {
-    console.log(ui);
+    
   },
   deactivate: function(event, ui) {
-    console.log(ui);
+    
   },
   over: function(event) {
-    console.log(event);
+    
   },
   out: function(event) {
-    console.log(event);
+    
   },
   update: function() {
     var tempArr = [];
@@ -107,10 +120,10 @@ $("#trash").droppable({
 
   },
   over: function(event, ui) {
-    console.log(ui);
+    
   },
   out: function(event, ui) {
-    console.log(ui);
+    
   }
 });
 
@@ -203,9 +216,16 @@ $(".list-group").on("click", "span", function() {
     .attr("type", "text")
     .addClass("form-control")
     .val(date);
+    
   $(this).replaceWith(dateInput);
 
   // automatically bring up the calendar
+  dateInput.datepicker({
+    minDate:1,
+    onClose: function(){
+      $(this).trigger("change");
+    }
+  });
   dateInput.trigger("focus");
 });
 
@@ -231,6 +251,7 @@ $(".list-group").on("change", "input[type='text']", function() {
     .addClass("badge badge-primary badge-pill")
     .text(date);
     $(this).replaceWith(taskSpan);
+  auditTask($(taskSpan).closest(".list-group-item"));  
 });
 
 // remove all tasks
@@ -239,9 +260,15 @@ $("#remove-tasks").on("click", function() {
     tasks[key].length = 0;
     $("#list-" + key).empty();
   }
-  console.log(tasks);
+  
   saveTasks();
 });
+
+$("#modalDueDate").datepicker({
+  minDate:1,
+});
+
+
 
 // load tasks for the first time
 loadTasks();
