@@ -1,6 +1,7 @@
 var tasks = {};
 
 var auditTask = function(taskEl){
+  console.log(taskEl);
   var date = $(taskEl).find("span").text().trim();
   var time = moment(date, "L").set("hour",17);
   $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
@@ -268,7 +269,11 @@ $("#modalDueDate").datepicker({
   minDate:1,
 });
 
-
+setInterval(function(){
+  $(".card .list-group-item").each(function(index,el){
+    auditTask(el);
+  });
+},5000);
 
 // load tasks for the first time
 loadTasks();
