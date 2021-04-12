@@ -51,6 +51,7 @@ $(".list-group").on("blur", "textarea", function () {
   var text = $(this).val().trim();
   var status = $(this).closest(".list-group").attr("id").replace("list-", "");
   var index = $(this).closest(".list-group-item").index();
+  console.log(text, status, index);
   tasks[status][index].text = text;
   saveTasks();
   var taskP = $("<p>").addClass("m-1").text(text);
@@ -77,6 +78,33 @@ $(".list-group").on("blur", "input[type='text']", function () {
     .addClass("badge badge-primary badge-pill")
     .text(date);
   $(this).replaceWith(taskSpan);
+});
+
+// Draggable list
+
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function (event) {},
+  deactivate: function (event) {},
+  over: function (event) {},
+  out: function (event) {},
+
+  update: function (event) {
+    var tempArr = [];
+    $(this)
+      .children()
+      .each(function () {
+        var text = $(this).find("p").text().trim();
+        var date = $(this).find("span").text().trim();
+        tempArr.push({ text: text, date: date });
+      });
+    var arrName = $(this).attr("id").replace("list-", "");
+    tasks[arrName] = tempArr;
+    saveTasks();
+  },
 });
 
 // modal was triggered
